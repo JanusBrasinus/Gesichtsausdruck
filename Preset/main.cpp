@@ -1,175 +1,121 @@
-#include "opencv2/opencv.hpp"
-#include <string>
-#include <vector>
+#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
 #include <iostream>
-#include "centroid.h"
-#include "cross.h"
+#include <stdio.h>
 
-using namespace cv;
 using namespace std;
+using namespace cv;
 
-
-int main(){ 
-
-    bool konfiguriert = false;
-   
-  	namedWindow("Original");
-    namedWindow("Linkes Auge");
-    namedWindow("Rechtes Auge");
-    namedWindow("Mund");
-	namedWindow("Konfiguration", CV_WINDOW_AUTOSIZE);
-	resizeWindow("Konfiguration", 500, 450);
-
-	createTrackbar("valueAugen", "Konfiguration", 0, 255);
-	setTrackbarPos("valueAugen", "Konfiguration", 50);
+int main(int argc, const char** argv)
+{
+	//create the cascade classifier object used for the face detection
+	CascadeClassifier face_cascade;
+    CascadeClassifier eye_cascade;
+    CascadeClassifier mouth_cascade;
+	//use the haarcascade_frontalface_alt.xml library
+	eye_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/eyes.xml");
+    face_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/face.xml");
     
-	createTrackbar("minHueMund", "Konfiguration", 0, 180);
-	setTrackbarPos("minHueMund", "Konfiguration", 160);
-
-    createTrackbar("saturationMund", "Konfiguration", 0, 255);
-	setTrackbarPos("saturationMund", "Konfiguration", 130);
-	createTrackbar("valueMund", "Konfiguration", 0, 255);
-	setTrackbarPos("valueMund", "Konfiguration", 50);
-	
-	Point centerMund;
-	Point centerLinkesAuge;
-	Point centerRechtesAuge;
-
-	VideoCapture webCam;
-    webCam.open(0);
-    int width = webCam.get(CV_CAP_PROP_FRAME_WIDTH);
-	int height = webCam.get(CV_CAP_PROP_FRAME_HEIGHT);
-	
-    cout << width;
+    mouth_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/mouth2.xml");
     
-	Mat videoFrameOriginal, camHSV, maskeGesicht, linkesAuge, rechtesAuge, mund;
+	//setup video capture device and link it to the first capture device
+	VideoCapture captureDevice;
+	captureDevice.open(0);
     
-    Mat mundRechteck(60, 120,CV_8UC1);
-    Mat linkesAugenRechteck(40, 60,CV_8UC1);
-    Mat rechtesAugenRechteck(40, 60,CV_8UC1);
+	//setup image files used in the capture process
+	Mat captureFrame;
+	Mat grayscaleFrame;
+    Mat faceFrame;
+    Mat mouthFrame;
+    Mat eyeFrame;
     
-	Mat ellipseZeichnen(webCam.get(CV_CAP_PROP_FRAME_HEIGHT), webCam.get(CV_CAP_PROP_FRAME_WIDTH), CV_8UC3, Scalar(0, 0, 0));
-
-	
-	ellipse(ellipseZeichnen,Point(webCam.get(CV_CAP_PROP_FRAME_WIDTH)/2, webCam.get(CV_CAP_PROP_FRAME_HEIGHT)/2),Size(150,213), 0.0, 0.0, 360.0, Scalar(255, 255, 255), -1);
-	cvtColor(ellipseZeichnen, maskeGesicht, CV_BGR2GRAY);
+    Mat faceGray;
     
+	//create a window to present the results
+	namedWindow("outputCapture", 1);
+    namedWindow("face", 1);
+    namedWindow("mouth", 1);
+    namedWindow("Eye", 1);
     
-    vector<Mat> planesLinkesAuge, planesRechtesAuge, planesMund, planes;
-
-	while (true){
+	//create a loop to capture and find faces
+	while(true)
+	{
+		//capture a new image frame
+		captureDevice>>captureFrame;
+        flip(captureFrame, captureFrame, 1);
         
-
-        Mat videoFrame;
-
-      
-		bool success = webCam.read(videoFrameOriginal);
-		if (success == false){
-			break;
-		}
         
-        flip(videoFrameOriginal, videoFrameOriginal, 1);
-       	
-        if(konfiguriert == false){
-            videoFrameOriginal.copyTo(videoFrame, maskeGesicht);
-        }
-        if(konfiguriert == true){
-            videoFrameOriginal.copyTo(videoFrame);
-        }
-        cvtColor(videoFrame,camHSV,CV_BGR2HSV);
-        split(camHSV, planes);
-
-		// Bildbereiche einteilen, ACHTUNG!! keine Kopie. Verweise sind auf Originalvideo
-		linkesAuge = camHSV(Rect(0,0, width/2, height/2));
-		rechtesAuge = camHSV(Rect(width/2, 0, width/2, height/2));
-		mund = camHSV(Rect(0, height/2, width, height/2));
-
-		split(linkesAuge, planesLinkesAuge);
-		split(rechtesAuge, planesRechtesAuge);
-		split(mund, planesMund);
-
-        inRange(planesMund[0], (getTrackbarPos("minHueMund", "Konfiguration"))-20, (getTrackbarPos("minHueMund", "Konfiguration"))+20, planesMund[0]);
-
-		threshold(planesMund[1], planesMund[1], getTrackbarPos("saturationMund", "Konfiguration"), 255, THRESH_BINARY);
+		//convert captured image to gray scale and equalize
+		cvtColor(captureFrame, grayscaleFrame, CV_BGR2GRAY);
+		equalizeHist(grayscaleFrame, grayscaleFrame);
         
-        threshold(planesLinkesAuge[2], planesLinkesAuge[2], getTrackbarPos("valueAugen", "Konfiguration"), 255, THRESH_BINARY);
+		//create a vector array to store the face found
+		std::vector<Rect> faces;
         
-        threshold(planesRechtesAuge[2], planesRechtesAuge[2], getTrackbarPos("valueAugen", "Konfiguration"), 255, THRESH_BINARY);
-
-		multiply(planesMund[0], planesMund[1], planesMund[0]);
-		multiply(planesMund[0], planesMund[2], planesMund[0]);
-
-        if (konfiguriert == false){
-            centerMund = centroidOfWhitePixels(planesMund[0]);
-            centerLinkesAuge = centroidOfWhitePixels(planesLinkesAuge[2]);
-            centerRechtesAuge = centroidOfWhitePixels(planesRechtesAuge[2]);
-
-        }
-
-        rectangle(videoFrame, Rect(centerMund.x - 60, centerMund.y - 30 + height/2, 120, 60), Scalar(0,0,255), 1);
-        rectangle(videoFrame, Rect(centerLinkesAuge.x - 30, centerLinkesAuge.y - 20, 60, 40), Scalar(0,0,255), 1);
-        rectangle(videoFrame, Rect(centerRechtesAuge.x - 30 + width/2, centerRechtesAuge.y - 20, 60, 40), Scalar(0,0,255), 1);
-
+		//find faces and store them in the vector array
+        face_cascade.detectMultiScale(grayscaleFrame, faces, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, Size(30,30));
         
-        if (konfiguriert == true){
-        linkesAugenRechteck = planesLinkesAuge[2](Rect(centerLinkesAuge.x - 30, centerLinkesAuge.y - 20, 60, 40));
-        
-        rechtesAugenRechteck = planesRechtesAuge[2](Rect((centerRechtesAuge.x)- 30, centerRechtesAuge.y - 20, 60, 40));
+        if(faces.size() > 0){
+            Point center( faces[0].x + faces[0].width*0.5, faces[0].y + faces[0].height*0.5 );
             
-        mundRechteck = planesMund[0](Rect((centerMund.x)- 60, centerMund.y - 30, 120, 60));
-         
+            Mat faceGrayROI = grayscaleFrame(faces[0]);
+            faceGrayROI.copyTo(faceGray);
+            Mat faceROI = captureFrame(faces[0]);
+            faceROI.copyTo(faceFrame);
+            
+            ellipse( captureFrame, center, Size( faces[0].width*0.4, faces[0].height*0.5), 0, 0, 360, Scalar( 255, 0, 0 ), 4, 8, 0 );
+    
+        
+            //create a vector array to store the face found
+            std::vector<Rect> mouth;
+            
+            
+            Mat mouthROI = faceGray(Rect(0, faceGray.rows/2, faceGray.cols, faceGray.rows/2));
+            //find faces and store them in the vector array
+            mouth_cascade.detectMultiScale(mouthROI, mouth, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, Size(30,30));
+            
+            
+            if(mouth.size() > 0){
+                Point center(faces[0].x + mouth[0].x + mouth[0].width*0.5, faces[0].y + faceGray.rows/2 + mouth[0].y +  mouth[0].height*0.5 );
+                
+                Mat mundROI = faceFrame(Rect(mouth[0].x, faceGray.rows/2 + mouth[0].y, mouth[0].width, mouth[0].height));
+                mundROI.copyTo(mouthFrame);
+                
+                ellipse( captureFrame, center, Size( mouth[0].width*0.4, mouth[0].height*0.5), 0, 0, 360, Scalar( 0, 255, 0 ), 4, 8, 0 );
+            }
+            
+            
+            //create a vector array to store the face found
+            std::vector<Rect> eyes;
+            
+            
+            //find faces and store them in the vector array
+            eye_cascade.detectMultiScale(faceGray, eyes, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, Size(30,30));
+            
+            if(eyes.size() > 0){
+                Point center(faces[0].x + eyes[0].x + eyes[0].width*0.5, faces[0].y + eyes[0].y +  eyes[0].height*0.5 );
+                
+                Mat eyesROI = faceFrame(eyes[0]);
+                eyesROI.copyTo(eyeFrame);
+                
+                ellipse( captureFrame, center, Size( eyes[0].width*0.4, eyes[0].height*0.5), 0, 0, 360, Scalar( 0, 0, 255 ), 4, 8, 0 );
+            }
+            
+            //print the output
+            imshow("mouth", mouthFrame);
+            imshow("face", faceFrame);
+            imshow("Eye", eyeFrame);
         }
-        if (konfiguriert == false){
-        imshow("Mund", planesMund[0]);
-		imshow("Linkes Auge", planesLinkesAuge[2]);
-        imshow("Rechtes Auge", planesRechtesAuge[2]);
-        }
+		imshow("outputCapture", captureFrame);
         
-        else{
+        //pause for 33ms
+		waitKey(33);
         
-            imshow("Linkes Auge", linkesAugenRechteck);
-            imshow("Rechtes Auge", rechtesAugenRechteck);
-            imshow("Mund", mundRechteck);
-        }
-        
-        
-        
-        
-        
-        
-
-        imshow( "Original", videoFrame );
-        // 30 ms auf einen Tastendruck warten
-		int key = waitKey(30);
-		if (key != -1){
-			konfiguriert = true;
-            resizeWindow("Linkes Auge",60, 40);
-            resizeWindow("Rechtes Auge",60, 40);
-            resizeWindow("Rechtes Auge",120, 60);
-            destroyWindow("Konfiguration");
-		}
 	}
     
-    destroyAllWindows();
     
+	return 0;
     
-
-    
-    /*
-	
-
-	while(true){
-		Mat videoFrame;
-		Mat mund;
-		Mat augen;
-		bool success = webCam.read(videoFrame);
-		if (success == false){
-			break;
-		}
-
-	}
-	*/
-    
-    waitKey(0);
-    return 0;
 }
