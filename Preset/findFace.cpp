@@ -13,13 +13,11 @@
 findFace::findFace()
 
 {
-    
     eye_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/eyes.xml");
     face_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/face.xml");
     mouth_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/mouth2.xml");
     
     captureDevice.open(0);
-    
 }
 
 findFace::~findFace(void){}
@@ -42,7 +40,6 @@ void findFace::detectFace(){
     
     //Bild der Webcam Horizontal spiegeln
     flip(captureFrame, captureFrame, 1);
-    
     
     //geladenen Frame in Graustufenbild umwandeln und nachjustieren
     cvtColor(captureFrame, grayscaleFrame, CV_BGR2GRAY);
@@ -80,12 +77,7 @@ void findFace::detectFace(){
             
             mouthFrame = faceFrame(mouth[0]);
         }
-        
-        
-        //Vector Array fuer im Gesicht gefundes Auge erstellen
-        
-        
-        
+
         //Augen finden und im Array speichern
         eye_cascade.detectMultiScale(grayscaleFrame, eyes, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, cv::Size(30,30));
         
@@ -99,10 +91,7 @@ void findFace::detectFace(){
 
             eyeFrame = faceFrame(eyes[0]);
         }
-        
-
     }
-    
 }
 
 cv::Mat findFace::getEyeROI(){
