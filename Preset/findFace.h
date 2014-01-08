@@ -1,15 +1,12 @@
-
 #include  <opencv2/opencv.hpp>
 #ifndef Preset_findFace_h
 #define Preset_findFace_h
-
 
 class findFace {
 
 public:
     findFace();
     ~findFace(void);
-    
     
     void detectFace();
     cv::Mat drawEllipse();
@@ -23,11 +20,7 @@ public:
     int getEyeHeight();
     int getMouthWidth();
     int getMouthHeight();
-    
-    
-    
-    
-    
+ 
 private:
     
     int eyeHeight;
@@ -46,9 +39,7 @@ private:
     cv::Mat faceFrame;
     cv::Mat mouthFrame;
     cv::Mat eyeFrame;
-    //cv::Mat faceGray;
-    //cv::Mat eyeFrameHSV;
-    
+
     cv::Point eyePos;
     cv::Point mouthPos;
     cv::Point facePos;
@@ -58,17 +49,11 @@ private:
     cv::CascadeClassifier mouth_cascade;
     
     cv::VideoCapture captureDevice;
-    
-    //cv::Scalar eyeColor;
-    //cv::Scalar mouthColor;
-    
-    
+
     std::vector<cv::Rect> faces;
     std::vector<cv::Rect> mouth;
     std::vector<cv::Rect> eyes;
 
-
 };
-
 
 #endif

@@ -13,7 +13,6 @@ public:
     int processEyeData(cv::Mat eyePlane);
     int processMouthData(cv:: Mat mouthPlane);
     
-    
 private:
     
     int eyeHigh;
