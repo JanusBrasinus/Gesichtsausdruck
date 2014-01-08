@@ -45,13 +45,13 @@ int processMidiData::processEyeData(cv::Mat eyeFrame){
     
     if(eyeHigh > eyeLow){
         
-        return eyeHigh + 1000000;
+        return 1;
 
         
     }
     else{
         
-        return eyeLow;
+        return 2;
 
     
     }
@@ -144,7 +144,7 @@ cv::Mat processMidiData::mouthTracking(cv::Mat mouthFrame){
     cvtColor(mouthFrame, mouthFrameHSV,CV_BGR2HSV);
     split(mouthFrameHSV, mouthPlanes);
     // Schwellwertbildung Hue für den Mund
-    inRange(eyePlanes[0], 10, 100, eyePlanes[0]);
+    inRange(mouthPlanes[0], 10, 100, mouthPlanes[0]);
     // Schwellwertbildung Saturation für das linke Auge
     threshold(mouthPlanes[1], mouthPlanes[1], 100, 255, cv::THRESH_BINARY);
     // SchwellenwetBildung Value für das linke Auge

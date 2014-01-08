@@ -1,6 +1,7 @@
 
 #include "findFace.h"
 #include "processMidiData.h"
+#include "sendMidi.h"
 //#include "GUI.h"
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -19,60 +20,32 @@ int main(int argc, const char** argv)
 
     findFace face;
     processMidiData process;
-    //GUI gui;
-    
-    float eyeCount[3];
- 
-    vector<Mat> eyePlanes;
-
+    sendMidi send;
     
 	//Fenster erstellen
 	namedWindow("outputCapture", 1);
     namedWindow("Face", 1);
     namedWindow("Mouth", 1);
     namedWindow("Eye", 1);
-    
-	//Endlosschliefe zur Gesichtserkennung
+
 	while(true)
 	{
-            face.detectFace();
-            process.processEyeData(face.getEyeROI());
+        face.detectFace();
         
-        
-        
-        
-        
-        
-      
-        
-        
+
         if(face.hasFace()){
         
             imshow("Mouth", process.mouthTracking(face.getMouthROI()));
-            //imshow("Eye", process.eyeTracking(face.getEyeROI()));
-         
+            imshow("Eye", process.eyeTracking(face.getEyeROI()));
+            send.sendMessage(process.processEyeData(face.getEyeROI()), process.processMouthData(face.getMouthROI()));
+
         }
         
-
         
-            
-            cout << process.processMouthData(face.getMouthROI()) << endl;
-         
-            eyeCount[0]=0;
-            eyeCount[1]=0;
-            eyeCount[2]=0;
-
-            
-        }
-        
-
-		//imshow("outputCapture", captureFrame);
-        
-        //pause for 33ms
+        cout << "lol";
 		waitKey(33);
-        
-	
 
-	return 0;
-    
+	
+    }
+    return 0;
 }

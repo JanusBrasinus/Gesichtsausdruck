@@ -12,6 +12,7 @@
 		3592D320187C281600940C91 /* findFace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3592D31F187C281600940C91 /* findFace.cpp */; };
 		3592D32E187C5C6B00940C91 /* processMidiData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3592D32D187C5C6B00940C91 /* processMidiData.cpp */; };
 		3592D331187DBD1700940C91 /* sendMidi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3592D330187DBD1700940C91 /* sendMidi.cpp */; };
+		3592D333187DCF4B00940C91 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3592D332187DCF4A00940C91 /* CoreMIDI.framework */; };
 		35C3BFE2184E26BD00862484 /* libopencv_highgui.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 35C3BFE1184E26BD00862484 /* libopencv_highgui.2.4.6.dylib */; };
 		35C3BFE4184E26C300862484 /* libopencv_core.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 35C3BFE3184E26C300862484 /* libopencv_core.2.4.6.dylib */; };
 		35E6E610184E299F00F2893D /* libopencv_contrib.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E6E60F184E299F00F2893D /* libopencv_contrib.2.4.6.dylib */; };
@@ -43,6 +44,7 @@
 		3592D32D187C5C6B00940C91 /* processMidiData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = processMidiData.cpp; sourceTree = "<group>"; };
 		3592D32F187DBD0900940C91 /* sendMidi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sendMidi.h; sourceTree = "<group>"; };
 		3592D330187DBD1700940C91 /* sendMidi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sendMidi.cpp; sourceTree = "<group>"; };
+		3592D332187DCF4A00940C91 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
 		35C3BFE1184E26BD00862484 /* libopencv_highgui.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.2.4.6.dylib; path = ../libopencv_highgui.2.4.6.dylib; sourceTree = "<group>"; };
 		35C3BFE3184E26C300862484 /* libopencv_core.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.2.4.6.dylib; path = ../libopencv_core.2.4.6.dylib; sourceTree = "<group>"; };
 		35E6E60F184E299F00F2893D /* libopencv_contrib.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_contrib.2.4.6.dylib; path = ../libopencv_contrib.2.4.6.dylib; sourceTree = "<group>"; };
@@ -55,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3592D333187DCF4B00940C91 /* CoreMIDI.framework in Frameworks */,
 				35E6E614184E306300F2893D /* libopencv_objdetect.2.4.6.dylib in Frameworks */,
 				35C3BFE4184E26C300862484 /* libopencv_core.2.4.6.dylib in Frameworks */,
 				35E6E612184E2E5C00F2893D /* libopencv_imgproc.2.4.6.dylib in Frameworks */,
@@ -69,6 +72,7 @@
 		352E804D17F1B9DB008BEAD3 = {
 			isa = PBXGroup;
 			children = (
+				3592D332187DCF4A00940C91 /* CoreMIDI.framework */,
 				35E6E613184E306300F2893D /* libopencv_objdetect.2.4.6.dylib */,
 				35E6E611184E2E5C00F2893D /* libopencv_imgproc.2.4.6.dylib */,
 				35E6E60F184E299F00F2893D /* libopencv_contrib.2.4.6.dylib */,
