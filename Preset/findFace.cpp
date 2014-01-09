@@ -68,6 +68,9 @@ void findFace::detectFace(){
         //Wenn Mund gefunden dann...
         if(mouth.size() > 0){
             
+           // mouth[0].height = 200;
+           // mouth[0].width = 300;
+            
             mouthHeight = mouth[0].height;
             mouthWidth = mouth[0].width;
             
@@ -76,6 +79,7 @@ void findFace::detectFace(){
             mouth[0].y += faceHeight/2;
             
             mouthFrame = faceFrame(mouth[0]);
+            resize(mouthFrame, mouthFrame, cv::Size(300,200));
         }
 
         //Augen finden und im Array speichern
@@ -90,6 +94,7 @@ void findFace::detectFace(){
             eyePos.y = faces[0].y + eyes[0].y + eyeHeight*0.5 ;
 
             eyeFrame = faceFrame(eyes[0]);
+            resize(eyeFrame, eyeFrame, cv::Size(150,100));
         }
     }
 }

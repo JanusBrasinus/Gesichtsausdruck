@@ -10,9 +10,9 @@ processMidiData::processMidiData(){}
 
 processMidiData::~processMidiData(void){}
 
-int processMidiData::processEyeData(cv::Mat eyeFrame){
+int processMidiData::processEyeData(int value,cv::Mat eyeFrame){
 
-    eyeTracked = eyeTracking(eyeFrame);
+    eyeTracked = eyeTracking(value, eyeFrame);
     eyeHigh = 0;
     eyeLow = 0;
 
@@ -38,9 +38,9 @@ int processMidiData::processEyeData(cv::Mat eyeFrame){
     }
 }
 
-int processMidiData::processMouthData(cv::Mat mouthFrame){
+int processMidiData::processMouthData( int value, cv::Mat mouthFrame){
     
-    mouthTracked = mouthTracking(mouthFrame);
+    mouthTracked = mouthTracking(value, mouthFrame);
     mouthHL = 0;
     mouthHR = 0;
     mouthLL = 0;
@@ -83,28 +83,29 @@ int processMidiData::processMouthData(cv::Mat mouthFrame){
 }
 
 
-cv::Mat processMidiData::eyeTracking(cv::Mat eyeFrame){
+cv::Mat processMidiData::eyeTracking(int value, cv::Mat eyeFrame){
     
     cvtColor(eyeFrame, eyeFrameHSV,CV_BGR2HSV);
     split(eyeFrameHSV, eyePlanes);
     // Schwellwertbildung Saturation für das linke Auge
     threshold(eyePlanes[1], eyePlanes[1], 10, 255, cv::THRESH_BINARY);
     // SchwellenwetBildung Value für das linke Auge
-    threshold(eyePlanes[2], eyePlanes[2], 30, 255, cv::THRESH_BINARY);
+    
+    threshold(eyePlanes[2], eyePlanes[2], value, 255, cv::THRESH_BINARY);
     // Kombination aller Masken
     multiply(eyePlanes[2], eyePlanes[1], eyePlanes[2]);
     
     return eyePlanes[2];
 }
 
-cv::Mat processMidiData::mouthTracking(cv::Mat mouthFrame){
+cv::Mat processMidiData::mouthTracking(int value, cv::Mat mouthFrame){
     
     cvtColor(mouthFrame, mouthFrameHSV,CV_BGR2HSV);
     split(mouthFrameHSV, mouthPlanes);
     // Schwellwertbildung Hue für den Mund
     inRange(mouthPlanes[0], 10, 100, mouthPlanes[0]);
     // Schwellwertbildung Saturation für das linke Auge
-    threshold(mouthPlanes[1], mouthPlanes[1], 100, 255, cv::THRESH_BINARY);
+    threshold(mouthPlanes[1], mouthPlanes[1], value, 255, cv::THRESH_BINARY);
     // SchwellenwetBildung Value für das linke Auge
     threshold(mouthPlanes[2], mouthPlanes[2], 50, 255, cv::THRESH_BINARY);
     

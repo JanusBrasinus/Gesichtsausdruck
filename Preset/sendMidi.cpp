@@ -18,14 +18,10 @@ sendMidi::sendMidi()
     
     bus1 = MIDIDeviceGetEntity(device, 0);
     bus2 = MIDIDeviceGetEntity(device, 1);
-    bus3 = MIDIDeviceGetEntity(device, 2);
-    bus4 = MIDIDeviceGetEntity(device, 3);
     
     midiOut1 = MIDIEntityGetSource(bus1, 0);
     midiOut2 = MIDIEntityGetSource(bus2, 0);
-    midiOut3 = MIDIEntityGetSource(bus3, 0);
-    midiOut4 = MIDIEntityGetSource(bus4, 0);
- 
+    
 }
 
 sendMidi::~sendMidi(void){}

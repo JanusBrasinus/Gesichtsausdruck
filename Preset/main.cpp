@@ -23,11 +23,20 @@ int main(int argc, const char** argv)
     sendMidi send;
     
 	//Fenster erstellen
-	namedWindow("outputCapture", 1);
-    namedWindow("Face", 1);
-    namedWindow("Mouth", 1);
-    namedWindow("Eye", 1);
 
+    namedWindow("Mouth", 1);
+    moveWindow("Mouth", 0,0);
+    namedWindow("Eye", 1);
+    moveWindow("Eye", 300,0);
+    namedWindow("Config", 1);
+    moveWindow("Config", 300, 200);
+    
+    createTrackbar("Augen", "Config", 0, 255);
+	setTrackbarPos("Augen", "Config", 30);
+    createTrackbar("Mund", "Config", 0, 180);
+	setTrackbarPos("Mund", "Config", 100);
+    
+    
 	while(true)
 	{
         face.detectFace();
@@ -35,15 +44,14 @@ int main(int argc, const char** argv)
 
         if(face.hasFace()){
         
-            imshow("Mouth", process.mouthTracking(face.getMouthROI()));
-            imshow("Eye", process.eyeTracking(face.getEyeROI()));
-            send.sendMessage(process.processEyeData(face.getEyeROI()), process.processMouthData(face.getMouthROI()));
+            imshow("Mouth", process.mouthTracking(getTrackbarPos("Mund", "Config"), face.getMouthROI()));
+            imshow("Eye", process.eyeTracking(getTrackbarPos("Augen", "Config"), face.getEyeROI()));
+            send.sendMessage(process.processEyeData(getTrackbarPos("Augen", "Config"), face.getEyeROI()), process.processMouthData(getTrackbarPos("Mund", "Config"), face.getMouthROI()));
 
         }
         
-        
-        cout << "lol";
-		waitKey(33);
+
+		waitKey(42);
 
 	
     }

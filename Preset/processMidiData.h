@@ -8,10 +8,10 @@ public:
     processMidiData();
     ~processMidiData(void);
 
-    cv::Mat eyeTracking(cv::Mat eyeFrame);
-    cv::Mat mouthTracking(cv::Mat mouthFrame);
-    int processEyeData(cv::Mat eyePlane);
-    int processMouthData(cv:: Mat mouthPlane);
+    cv::Mat eyeTracking(int value, cv::Mat eyeFrame);
+    cv::Mat mouthTracking(int value, cv::Mat mouthFrame);
+    int processEyeData(int value, cv::Mat eyePlane);
+    int processMouthData(int value, cv:: Mat mouthPlane);
     
 private:
     
