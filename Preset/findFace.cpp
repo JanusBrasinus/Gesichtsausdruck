@@ -13,10 +13,12 @@
 findFace::findFace()
 
 {
+    //Laden der CasscadeClassifier Daten
     eye_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/eyes.xml");
     face_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/face.xml");
     mouth_cascade.load("/Users/benutzer/Dropbox/WS2013:2014/AVPRG/Projekt/Recognition Test/mouth2.xml");
     
+    //Webcam ansteuern
     captureDevice.open(0);
 }
 
@@ -24,19 +26,26 @@ findFace::~findFace(void){}
 
 cv::Mat findFace::drawOutput(cv::Mat mouthOverlay, cv::Mat eyeOverlay){
     
+    //Webcamframe zwischenspeichern
     captureFrame.copyTo(outputFrame);
+    
+    //Mund- und Augenframe in BGR umwandeln
     cv::cvtColor(eyeOverlay, eyeOverlay, CV_GRAY2BGR);
+    cv::cvtColor(mouthOverlay, mouthOverlay, CV_GRAY2BGR);
     
+    //Rechtecke an Mund. und Augenpostition erzeugen
     cv::Rect eyeRoi( eyePos, cv::Size( eyeWidth, eyeHeight ));
-    cv::Mat eyeDestinationROI = outputFrame( eyeRoi );
-    eyeOverlay.copyTo( eyeDestinationROI );
+    cv::Rect mouthRoi( mouthPos, cv::Size( mouthWidth, mouthHeight ));
     
+    //Bereich auf Ausgabeframe den Rechtecken zuweisen
+    cv::Mat mouthDestinationROI = outputFrame( mouthRoi );
+    cv::Mat eyeDestinationROI = outputFrame( eyeRoi );
+    
+    //Farben invertieren
     cv::subtract(cv::Scalar(255),mouthOverlay, mouthOverlay);
     
-    cv::cvtColor(mouthOverlay, mouthOverlay, CV_GRAY2BGR);
-
-    cv::Rect mouthRoi( mouthPos, cv::Size( mouthWidth, mouthHeight ));
-    cv::Mat mouthDestinationROI = outputFrame( mouthRoi );
+    //Rechtecke mit Mund und Augen füllen
+    eyeOverlay.copyTo( eyeDestinationROI );
     mouthOverlay.copyTo( mouthDestinationROI );
     
     
@@ -67,9 +76,9 @@ void findFace::detectFace(){
         faceHeight = faces[0].height;
         faceWidth = faces[0].width;
         
-        facePos.x = faces[0].x +  faceWidth*0.5 ;
-        facePos.y = faces[0].y +  faceHeight*0.5 ;
- 
+        facePos.x = faces[0].x +  faceWidth*0.5;
+        facePos.y = faces[0].y +  faceHeight*0.5;
+        
         grayscaleFrame = grayscaleFrame(faces[0]);
 
         faceFrame = captureFrame(faces[0]);

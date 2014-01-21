@@ -2,33 +2,30 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <CoreMIDI/CoreMIDI.h>
-
 #include <iostream>
 #include <stdio.h>
 #include <algorithm>
-
 #include "sendMidi.h"
 
-
-
 sendMidi::sendMidi()
-
 {
+    //Standart Midi Device auswählen
     device = MIDIGetDevice(0);
     
+    //Midi Busse initialisieren
     bus1 = MIDIDeviceGetEntity(device, 0);
     bus2 = MIDIDeviceGetEntity(device, 1);
     
+    //Midi Ausgänge festlegen
     midiOut1 = MIDIEntityGetSource(bus1, 0);
     midiOut2 = MIDIEntityGetSource(bus2, 0);
-    
 }
 
 sendMidi::~sendMidi(void){}
 
 void sendMidi::sendMessage(int melodie, int drum){
     
-    
+    // Datenpakete in Abhängigkeit von übergebenen Parametern verschicken
     if(melodie == 1){
         MIDIPacket *currentpacket1 = MIDIPacketListInit(packetlist1);
         Byte msgs1[9] = {0xB0, 0, (Byte)123, 0xB1, 0, (Byte)0, 0xB2, 0, (Byte)0};
@@ -77,9 +74,4 @@ void sendMidi::sendMessage(int melodie, int drum){
         currentpacket2 = MIDIPacketListAdd(packetlist2, sizeof(buffer),currentpacket2, timestamp, (Byte)(12), msgs2);
         MIDIReceived(midiOut2, packetlist2);
     }
-
-    
-    
-    
-    
 }
