@@ -24,12 +24,14 @@ int main(int argc, const char** argv)
     
 	//Fenster erstellen
 
-    namedWindow("Mouth", 1);
-    moveWindow("Mouth", 0,0);
-    namedWindow("Eye", 1);
-    moveWindow("Eye", 300,0);
+    namedWindow("Face", 1);
+    moveWindow("Face", 300,222);
+
+
     namedWindow("Config", 1);
-    moveWindow("Config", 300, 200);
+    moveWindow("Config", 520, 200);
+    resizeWindow("Config", 200, 20);
+    
     
     createTrackbar("Augen", "Config", 0, 255);
 	setTrackbarPos("Augen", "Config", 30);
@@ -43,9 +45,12 @@ int main(int argc, const char** argv)
         
 
         if(face.hasFace()){
-        
-            imshow("Mouth", process.mouthTracking(getTrackbarPos("Mund", "Config"), face.getMouthROI()));
-            imshow("Eye", process.eyeTracking(getTrackbarPos("Augen", "Config"), face.getEyeROI()));
+
+            imshow("Face", face.drawOutput(process.mouthTracking(getTrackbarPos("Mund", "Config"),face.getMouthROI()),
+                                           process.eyeTracking(getTrackbarPos("Augen", "Config"),face.getEyeROI())));
+            
+            
+
             send.sendMessage(process.processEyeData(getTrackbarPos("Augen", "Config"), face.getEyeROI()), process.processMouthData(getTrackbarPos("Mund", "Config"), face.getMouthROI()));
 
         }

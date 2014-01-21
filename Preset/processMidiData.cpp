@@ -13,28 +13,37 @@ processMidiData::~processMidiData(void){}
 int processMidiData::processEyeData(int value,cv::Mat eyeFrame){
 
     eyeTracked = eyeTracking(value, eyeFrame);
-    eyeHigh = 0;
-    eyeLow = 0;
+    eyeLeft = 0;
+    eyeMid = 0;
+    eyeRight = 0;
 
     
-    for(int i = 0; i < eyeTracked.cols; i++){
+    for(int i = eyeTracked.cols/3 ; i < eyeTracked.cols/3*2; i++){
         for(int j = eyeTracked.rows/3; j < eyeTracked.rows/3*2; j++){
             
-            if(j < eyeTracked.rows/2 && eyeTracked.at<uchar>(j,i) == 0)
+            if(i > eyeTracked.cols/9*3 && i < eyeTracked.cols/9*4 && eyeTracked.at<uchar>(j,i) == 0)
             {
-                eyeHigh++;
+                eyeLeft++;
             }
-            if(j > eyeTracked.rows/2 && eyeTracked.at<uchar>(j,i) == 0)
+            if(i > eyeTracked.cols/9*4 && i < eyeTracked.cols/9*5 && eyeTracked.at<uchar>(j,i) == 0)
             {
-                eyeLow++;
+                eyeMid++;
+            }
+            if(i > eyeTracked.cols/9*5 && eyeTracked.at<uchar>(j,i) == 0)
+            {
+                eyeRight++;
             }
         }
     }
-    if(eyeHigh > eyeLow){
+    
+    if(eyeLeft > eyeRight && eyeLeft > eyeMid){
         return 1;
     }
-    else{
+    else if(eyeMid > eyeRight && eyeMid > eyeLeft){
         return 2;
+    }
+    else{
+        return 3;
     }
 }
 
@@ -94,6 +103,10 @@ cv::Mat processMidiData::eyeTracking(int value, cv::Mat eyeFrame){
     threshold(eyePlanes[2], eyePlanes[2], value, 255, cv::THRESH_BINARY);
     // Kombination aller Masken
     multiply(eyePlanes[2], eyePlanes[1], eyePlanes[2]);
+   
+    //cv::erode(eyePlanes[2], eyePlanes[2],cv::Mat(cv::Size(3, 3), CV_8UC1));
+    //cv::dilate(eyePlanes[2], eyePlanes[2],cv::Mat(cv::Size(5, 5), CV_8UC1));
+    
     
     return eyePlanes[2];
 }

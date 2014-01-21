@@ -9,7 +9,7 @@ public:
     ~findFace(void);
     
     void detectFace();
-    cv::Mat drawEllipse();
+    cv::Mat drawOutput(cv::Mat mouthOverlay, cv::Mat eyeOverlay);
     cv::Mat getCaptureFrame();
     cv::Mat getEyeROI();
     cv::Mat getMouthROI();

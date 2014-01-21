@@ -22,13 +22,24 @@ findFace::findFace()
 
 findFace::~findFace(void){}
 
-cv::Mat findFace::drawEllipse(){
+cv::Mat findFace::drawOutput(cv::Mat mouthOverlay, cv::Mat eyeOverlay){
     
     captureFrame.copyTo(outputFrame);
+    cv::cvtColor(eyeOverlay, eyeOverlay, CV_GRAY2BGR);
     
-    ellipse( outputFrame, eyePos, cv::Size( eyeWidth*0.4, eyeHeight*0.5), 0, 0, 360, cv::Scalar(0,255,0), 4, 8, 0 );
-    ellipse( outputFrame, mouthPos, cv::Size( mouthWidth*0.4, mouthHeight*0.5), 0, 0, 360,cv::Scalar(0,0,255), 4, 8, 0 );
+    cv::Rect eyeRoi( eyePos, cv::Size( eyeWidth, eyeHeight ));
+    cv::Mat eyeDestinationROI = outputFrame( eyeRoi );
+    eyeOverlay.copyTo( eyeDestinationROI );
+    
+    cv::subtract(cv::Scalar(255),mouthOverlay, mouthOverlay);
+    
+    cv::cvtColor(mouthOverlay, mouthOverlay, CV_GRAY2BGR);
 
+    cv::Rect mouthRoi( mouthPos, cv::Size( mouthWidth, mouthHeight ));
+    cv::Mat mouthDestinationROI = outputFrame( mouthRoi );
+    mouthOverlay.copyTo( mouthDestinationROI );
+    
+    
     return outputFrame;
 
 }
@@ -44,6 +55,7 @@ void findFace::detectFace(){
     //geladenen Frame in Graustufenbild umwandeln und nachjustieren
     cvtColor(captureFrame, grayscaleFrame, CV_BGR2GRAY);
     equalizeHist(grayscaleFrame, grayscaleFrame);
+    //equalizeHist(grayscaleFrame, grayscaleFrame);
 
     //Gesichter finden und in Array schreiben
     face_cascade.detectMultiScale(grayscaleFrame, faces, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, cv::Size(30,30));
@@ -68,33 +80,30 @@ void findFace::detectFace(){
         //Wenn Mund gefunden dann...
         if(mouth.size() > 0){
             
-           // mouth[0].height = 200;
-           // mouth[0].width = 300;
-            
             mouthHeight = mouth[0].height;
             mouthWidth = mouth[0].width;
-            
-            mouthPos.x = faces[0].x + mouth[0].x + mouthWidth*0.5 ;
-            mouthPos.y = faces[0].y + mouth[0].y + mouthHeight*0.5 + faceHeight/2;
+
+            mouthPos.x = faces[0].x + mouth[0].x;
+            mouthPos.y = faces[0].y + mouth[0].y + faceHeight/2;
             mouth[0].y += faceHeight/2;
             
             mouthFrame = faceFrame(mouth[0]);
-            resize(mouthFrame, mouthFrame, cv::Size(300,200));
+
         }
 
         //Augen finden und im Array speichern
-        eye_cascade.detectMultiScale(grayscaleFrame, eyes, 1.1, 3, CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, cv::Size(30,30));
+        eye_cascade.detectMultiScale(grayscaleFrame(cv::Rect(0,0,faceWidth/2, faceHeight)), eyes, 1.1, 6, CV_HAAR_FIND_BIGGEST_OBJECT|CV_HAAR_SCALE_IMAGE, cv::Size(30,30));
         
         if(eyes.size() > 0){
             
             eyeHeight = eyes[0].height;
             eyeWidth = eyes[0].width;
-            
-            eyePos.x = faces[0].x + eyes[0].x + eyeWidth*0.5 ;
-            eyePos.y = faces[0].y + eyes[0].y + eyeHeight*0.5 ;
+
+            eyePos.x = faces[0].x + eyes[0].x;
+            eyePos.y = faces[0].y + eyes[0].y;
 
             eyeFrame = faceFrame(eyes[0]);
-            resize(eyeFrame, eyeFrame, cv::Size(150,100));
+
         }
     }
 }

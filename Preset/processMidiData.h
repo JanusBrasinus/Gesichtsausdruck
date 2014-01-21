@@ -15,8 +15,9 @@ public:
     
 private:
     
-    int eyeHigh;
-    int eyeLow;
+    int eyeLeft;
+    int eyeMid;
+    int eyeRight;
     int mouthHL;
     int mouthHR;
     int mouthLL;
